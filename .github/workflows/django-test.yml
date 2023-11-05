@@ -2,6 +2,7 @@ name: Django Test
 
 on:
   push:
+    branches: [ t ]
   pull_request:
   
 jobs:
