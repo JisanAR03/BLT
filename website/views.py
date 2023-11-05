@@ -560,11 +560,7 @@ class IssueCreate(IssueBaseCreate, CreateView):
                     pass
 
                 else:
-                    parsed_url = urllib.parse.urlparse(url)
-                    if parsed_url.scheme not in ["http", "https"]:
-                        raise Exception("Invalid URL scheme")
-
-                    response = requests.get(parsed_url.geturl(), timeout=2)
+                    response = requests.get( "https://" + url ,timeout=2)
                     if response.status_code == 200:
                         print('Web site exists')
                     else:
