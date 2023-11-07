@@ -815,9 +815,17 @@ class InviteCreate(TemplateView):
         if email:
             domain = email.split("@")[-1]
             try:
-                ret = urllib.request.urlopen("http://" + domain + "/favicon.ico")
-                if ret.code == 200:
-                    exists = "exists"
+                full_url_domain = "https://" + domain
+                if is_valid_https_url(full_url_domain):
+                    safe_url = rebuild_safe_url(full_url_domain)
+                    try:
+                        response = requests.get(safe_url, timeout=5)
+                        if response.status_code == 200:
+                            exists = "exists"
+                        else:
+                            raise Exception
+                    except Exception as e:
+                        raise Exception
             except:
                 pass
         context = {
