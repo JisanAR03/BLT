@@ -3,7 +3,7 @@ import uuid
 import json
 from django import http 
 import requests
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 from datetime import timedelta, datetime
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -14,6 +14,7 @@ from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from django.db.models.functions import ExtractMonth
 from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
 from django.http import Http404,HttpResponse
@@ -29,6 +30,11 @@ def is_valid_https_url(url):
         return True
     except ValidationError:
         return False
+def rebuild_safe_url(url):
+    parsed_url = urlparse(url)
+    # Rebuild the URL with scheme, netloc, and path only
+    return urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, '', '', ''))
+
 
 def get_email_domain(email):
     domain = email.split("@")[-1]
@@ -442,10 +448,23 @@ class AddDomainView(View):
         # validate domain url
         try:
             if is_valid_https_url(domain_data["url"]):
-                print(domain_data["url"])
-                response = requests.get(domain_data["url"] ,timeout=5)
-                if response.status_code != 200:
-                    raise Exception
+                safe_url = rebuild_safe_url(domain_data["url"])
+                try:
+                    response = requests.get(safe_url, timeout=5)
+                    if response.status_code != 200:
+                        messages.error(request, "Domain does not respond correctly.")
+                        return redirect("add_domain", company)
+                except requests.RequestException:
+                    messages.error(request, "Error connecting to the domain.")
+                    return redirect("add_domain", company)
+            else:
+                messages.error(request, "Invalid URL. Only HTTPS URLs are allowed.")
+                return redirect("add_domain", company)
+            # if is_valid_https_url(domain_data["url"]):
+            #     print(domain_data["url"])
+            #     response = requests.get(domain_data["url"] ,timeout=5)
+            #     if response.status_code != 200:
+            #         raise Exception
         except Exception as e:
             print(e)
             messages.error(request,"Domain does not exist.")
