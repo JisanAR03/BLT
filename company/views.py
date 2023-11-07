@@ -17,7 +17,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
-from django.http import Http404,HttpResponse
+from django.http import Http404
 
 from website.models import Company, Domain, Issue, Hunt, UserProfile, HuntPrize
 
@@ -452,19 +452,10 @@ class AddDomainView(View):
                 try:
                     response = requests.get(safe_url, timeout=5)
                     if response.status_code != 200:
-                        messages.error(request, "Domain does not respond correctly.")
-                        return redirect("add_domain", company)
-                except requests.RequestException:
-                    messages.error(request, "Error connecting to the domain.")
-                    return redirect("add_domain", company)
-            else:
-                messages.error(request, "Invalid URL. Only HTTPS URLs are allowed.")
-                return redirect("add_domain", company)
-            # if is_valid_https_url(domain_data["url"]):
-            #     print(domain_data["url"])
-            #     response = requests.get(domain_data["url"] ,timeout=5)
-            #     if response.status_code != 200:
-            #         raise Exception
+                        raise Exception
+                except Exception as e:
+                    messages.error(request,"Domain does not exist.")
+                    return redirect("add_domain",company)
         except Exception as e:
             print(e)
             messages.error(request,"Domain does not exist.")
