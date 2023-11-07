@@ -815,7 +815,7 @@ class InviteCreate(TemplateView):
         if email:
             domain = email.split("@")[-1]
             try:
-                full_url_domain = "https://" + domain
+                full_url_domain = "https://" + domain + "/favicon.ico"
                 if is_valid_https_url(full_url_domain):
                     safe_url = rebuild_safe_url(full_url_domain)
                     try:
