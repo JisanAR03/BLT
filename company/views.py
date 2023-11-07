@@ -13,14 +13,22 @@ from django.contrib import messages
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from django.db.models.functions import ExtractMonth
+from django.core.validators import URLValidator
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404,HttpResponse
 
 from website.models import Company, Domain, Issue, Hunt, UserProfile, HuntPrize
 
 restricted_domain = ["gmail.com","hotmail.com","outlook.com","yahoo.com","proton.com"]
 
+def is_valid_https_url(url):
+    validate = URLValidator(schemes=['https'])  # Only allow HTTPS URLs
+    try:
+        validate(url)
+        return True
+    except ValidationError:
+        return False
 
 def get_email_domain(email):
     domain = email.split("@")[-1]
@@ -433,10 +441,11 @@ class AddDomainView(View):
 
         # validate domain url
         try:
-            print(domain_data["url"])
-            response = requests.get(domain_data["url"] ,timeout=5)
-            if response.status_code != 200:
-                raise Exception
+            if is_valid_https_url(domain_data["url"]):
+                print(domain_data["url"])
+                response = requests.get(domain_data["url"] ,timeout=5)
+                if response.status_code != 200:
+                    raise Exception
         except Exception as e:
             print(e)
             messages.error(request,"Domain does not exist.")
