@@ -480,8 +480,8 @@ STRIPE_LIVE_MODE = False  # Change to True in production
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-# CALLBACK_URL_FOR_GITHUB = os.environ.get(
-#     "CALLBACK_URL_FOR_GITHUB", default="https://www." + DOMAIN_NAME +"/")
+CALLBACK_URL_FOR_GITHUB = os.environ.get(
+    "CALLBACK_URL_FOR_GITHUB", default="https://www." + DOMAIN_NAME +"/")
 
 # CALLBACK_URL_FOR_GOOGLE = os.environ.get(
 #     "CALLBACK_URL_FOR_GOOGLE", default="https://www." + DOMAIN_NAME +"/")

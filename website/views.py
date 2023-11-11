@@ -181,12 +181,14 @@ def index(request, template="index.html"):
 
 
 def github_callback(request):
-    ALLOWED_HOSTS = ['github.com']
-    params = urllib.parse.urlencode(request.GET)
-    url = f"{settings.CALLBACK_URL_FOR_GITHUB}?{params}"
-    parsed_url = urlparse(url)
-    if parsed_url.netloc in ALLOWED_HOSTS:
-        return redirect(url)
+    print("Github callback")
+    return HttpResponse("Github callback")
+    # ALLOWED_HOSTS = ['github.com']
+    # params = urllib.parse.urlencode(request.GET)
+    # url = f"{settings.CALLBACK_URL_FOR_GITHUB}?{params}"
+    # parsed_url = urlparse(url)
+    # if parsed_url.netloc in ALLOWED_HOSTS:
+    #     return redirect(url)
 
 
 def google_callback(request):
