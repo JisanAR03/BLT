@@ -262,7 +262,13 @@ class ProjectRepoFilter(django_filters.FilterSet):
         fields = ["search", "repo_type", "sort", "order"]
 
     def filter_search(self, queryset, name, value):
-        return queryset.filter(Q(project__name__icontains=value) | Q(name__icontains=value))
+        return queryset.filter(
+            Q(project__name__icontains=value)  # Search in project name
+            | Q(name__icontains=value)  # Search in repo name
+            | Q(primary_language__icontains=value)  # Search in primary language
+            | Q(ai_summary__icontains=value)  # Search in AI summary
+            | Q(readme_content__icontains=value)  # Search in readme content
+        )
 
     def filter_repo_type(self, queryset, name, value):
         if value == "main":
