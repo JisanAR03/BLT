@@ -1,7 +1,8 @@
 from django.utils import timezone
 
+from comments.models import Comment
 from website.management.base import LoggedBaseCommand
-from website.models import Comment, Issue, User
+from website.models import Issue, User
 
 
 class Command(LoggedBaseCommand):
